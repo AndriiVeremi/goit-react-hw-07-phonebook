@@ -1,22 +1,25 @@
-export const getFilter = store => store.filter;
-export const getContacts = store => store.contacts;
-export const getFilteredContacts = store => {
-  const { filter, contacts } = store;
+import { createSelector } from '@reduxjs/toolkit';
 
-  if (!filter) {
-    return contacts;
+export const selectIsLoading = ({ contacts }) => contacts.isLoading;
+export const selectError = ({ contacts }) => contacts.error;
+export const selectFilter = ({ filter }) => filter;
+
+export const selectContacts = ({ contacts }) =>
+  [...contacts.items].sort((a, b) => a.name.localeCompare(b.name));
+
+export const selectFilteredContacts = createSelector(
+  [selectContacts, selectFilter],
+  (contacts, filter) => {
+    if (!filter) {
+      return contacts;
+    }
+    const normalizedFilter = filter.toLowerCase();
+    const filteredContacts = contacts.filter(
+      ({ name, phone }) =>
+        name.toLowerCase().trim().includes(normalizedFilter) ||
+        phone.trim().includes(normalizedFilter)
+    );
+    return filteredContacts;
   }
+);
 
-  const normalizedFilter = filter.toLowerCase();
-  const filteredContacts = contacts.filter(
-    ({ name, number }) =>
-      name.toLowerCase().trim().includes(normalizedFilter) ||
-      number.trim().includes(normalizedFilter)
-  );
-
-  if (normalizedFilter && !filteredContacts.length) {
-    alert('No contacts matching your request');
-  }
-  
-  return filteredContacts;
-};

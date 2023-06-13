@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { addContact } from '../../redux/contactsOperation';
+
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { addContact } from '../../redux/contactsSlice';
-import { getContacts } from '../../redux/selector';
 import {
   AiOutlineUser,
   AiOutlineUserAdd,
@@ -10,10 +10,10 @@ import {
 } from 'react-icons/ai';
 import { Form, Input, Label, Button } from './ContactForm.styled';
 
-function ContactForm({ contact, onSubmits }) {
+function ContactForm() {
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-  const contacts = useSelector(getContacts);
+  const [phone, setPhone] = useState('');
+
   const dispatch = useDispatch();
 
   const handleChange = e => {
@@ -21,8 +21,8 @@ function ContactForm({ contact, onSubmits }) {
       case 'name':
         setName(e.currentTarget.value);
         break;
-      case 'number':
-        setNumber(e.currentTarget.value);
+      case 'phone':
+        setPhone(e.currentTarget.value);
         break;
       default:
         return;
@@ -31,15 +31,13 @@ function ContactForm({ contact, onSubmits }) {
 
   const handleSubmit = e => {
     e.preventDefault();
-    contacts.some(contact => contact.name.toLowerCase() === name.toLowerCase())
-      ? alert(`${name} is already in contacts`)
-      : dispatch(addContact({ name, number }));
+    dispatch(addContact({ name, phone }));
     reset();
   };
 
   const reset = () => {
     setName('');
-    setNumber('');
+    setPhone('');
   };
 
   return (
@@ -60,12 +58,12 @@ function ContactForm({ contact, onSubmits }) {
 
       <Label>
         <AiTwotonePhone />
-        Number :
+        Phone :
         <Input
           type="tel"
-          value={number}
+          value={phone}
           onChange={handleChange}
-          name="number"
+          name="phone"
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required

@@ -1,27 +1,46 @@
-import React from 'react';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchContacts, deleteContact } from '../../redux/contactsOperation';
+import {
+  selectFilteredContacts,
+  selectFilter,
+} from '../../redux/selector';
+
 import PropTypes from 'prop-types';
 import { AiOutlineUserDelete } from 'react-icons/ai';
-
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteContact } from '../../redux/contactsSlice';
-import { getFilteredContacts } from '../../redux/selector';
-
 import { Item, Name, Text, Button } from './ContactList.styled';
 
 const ContactList = () => {
-  const contacts = useSelector(getFilteredContacts);
+
+  const filter = useSelector(selectFilter);
   const dispatch = useDispatch();
-  const onDeleteContact = contactId => {
-    dispatch(deleteContact(contactId));
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
+  const result = useSelector(selectFilteredContacts);
+
+  const onDeleteContact = id => {
+    dispatch(deleteContact(id));
   };
+
+  const getFilteredContacts = data => {
+    if (filter.toLowerCase() && !data.length) {
+      alert('No contacts matching your request');
+    }
+    return data;
+  };
+
+  const filteredContacts = getFilteredContacts(result);
 
   return (
     <>
-      {contacts.map(({ id, name, number }) => {
+      {filteredContacts.map(({ id, name, phone }) => {
         return (
           <Item key={id}>
             <Name>{name} :</Name>
-            <Text>{number}</Text>
+            <Text>{phone}</Text>
             <Button type="button" onClick={() => onDeleteContact(id)}>
               <AiOutlineUserDelete />
               Delete
