@@ -5,7 +5,7 @@ import {
   selectFilteredContacts,
   selectFilter,
 } from '../../redux/selector';
-
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import PropTypes from 'prop-types';
 import { AiOutlineUserDelete } from 'react-icons/ai';
 import { Item, Name, Text, Button } from './ContactList.styled';
@@ -27,7 +27,7 @@ const ContactList = () => {
 
   const getFilteredContacts = data => {
     if (filter.toLowerCase() && !data.length) {
-      alert('No contacts matching your request');
+      Notify.warning('No contacts matching your request');
     }
     return data;
   };

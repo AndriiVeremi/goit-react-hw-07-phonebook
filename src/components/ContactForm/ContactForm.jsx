@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addContact } from '../../redux/contactsOperation';
-
+import { selectContacts } from '../../redux/selector';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import PropTypes from 'prop-types';
 import {
   AiOutlineUser,
@@ -15,6 +16,7 @@ function ContactForm() {
   const [phone, setPhone] = useState('');
 
   const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
 
   const handleChange = e => {
     switch (e.currentTarget.name) {
@@ -29,10 +31,22 @@ function ContactForm() {
     }
   };
 
+  const checkUniq = name => {
+    const newName = name.toLowerCase();
+    return contacts.find(({ name }) => name.toLowerCase() === newName);
+  };
+
   const handleSubmit = e => {
     e.preventDefault();
-    dispatch(addContact({ name, phone }));
-    reset();
+
+    if (!checkUniq(name)) {
+      dispatch(addContact({ name, phone }));
+      Notify.success('The contact has been sent to storage');
+      reset();
+    } else {
+      Notify.failure('Sorry,Not a unique contact');
+      return;
+    }
   };
 
   const reset = () => {

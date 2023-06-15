@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import * as api from '../services/contacts-api';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 export const fetchContacts = createAsyncThunk(
   'contacts/fetchContacts',
@@ -13,43 +14,17 @@ export const fetchContacts = createAsyncThunk(
   }
 );
 
-const isDublicate = (contacts, { name, phone }) => {
-  const normalizedName = name.toLowerCase().trim();
-  const normalizedNumber = phone.trim();
-
-  const dublicate = contacts.some(
-    contact =>
-      contact.name.toLowerCase().trim() === normalizedName ||
-      contact.phone.trim() === normalizedNumber
-  );
-  return dublicate;
-};
-
 export const addContact = createAsyncThunk(
   'contacts/addContact',
   async (data, { rejectWithValue }) => {
     try {
       const { data: result } = await api.addContact(data);
-      alert(`you have added a contact ${data.name}`);
+      Notify.success(`you have added new contact ${data.name}`);
       return result;
     } catch ({ response }) {
       return rejectWithValue(`Ooops! Wrong... Try again`);
     }
   },
-
-  {
-    condition: (data, { getState }) => {
-      const {
-        contacts: { items },
-      } = getState();
-
-      if (isDublicate(items, data)) {
-        alert(`This contact is already in contacts`);
-        return false; 
-      }
-    },
-  }
-
 );
 
 export const deleteContact = createAsyncThunk(
@@ -57,7 +32,7 @@ export const deleteContact = createAsyncThunk(
     async (id, { rejectWithValue }) => {
       try {
         await api.deleteContact(id);
-        alert(`you definitely want to delete the contact?`);
+        Notify.success('you delete contact');
         return id;
       } catch ({ response }) {
         return rejectWithValue(`Ooops! Wrong... Try again`);
