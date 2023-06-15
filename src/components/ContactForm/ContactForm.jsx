@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addContact } from '../../redux/contactsOperation';
 import { selectContacts } from '../../redux/selector';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import PropTypes from 'prop-types';
 import {
   AiOutlineUser,
   AiOutlineUserAdd,
@@ -31,7 +30,7 @@ function ContactForm() {
     }
   };
 
-  const checkUniq = name => {
+  const checkName = name => {
     const newName = name.toLowerCase();
     return contacts.find(({ name }) => name.toLowerCase() === newName);
   };
@@ -39,12 +38,12 @@ function ContactForm() {
   const handleSubmit = e => {
     e.preventDefault();
 
-    if (!checkUniq(name)) {
+    if (!checkName(name)) {
       dispatch(addContact({ name, phone }));
       Notify.success('The contact has been sent to storage');
       reset();
     } else {
-      Notify.failure('Sorry,Not a unique contact');
+      Notify.failure('Sorry, Not a unique contact');
       return;
     }
   };
@@ -94,6 +93,4 @@ function ContactForm() {
 
 export default ContactForm;
 
-ContactForm.propType = {
-  onSubmit: PropTypes.func.isRequired,
-};
+

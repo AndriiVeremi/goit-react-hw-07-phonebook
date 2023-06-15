@@ -4,6 +4,8 @@ import { fetchContacts, deleteContact } from '../../redux/contactsOperation';
 import {
   selectFilteredContacts,
   selectFilter,
+  selectIsLoading,
+  selectError,
 } from '../../redux/selector';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import PropTypes from 'prop-types';
@@ -11,8 +13,9 @@ import { AiOutlineUserDelete } from 'react-icons/ai';
 import { Item, Name, Text, Button } from './ContactList.styled';
 
 const ContactList = () => {
-
+  const isLoading = useSelector(selectIsLoading);
   const filter = useSelector(selectFilter);
+  const error = useSelector(selectError);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -20,6 +23,15 @@ const ContactList = () => {
   }, [dispatch]);
 
   const result = useSelector(selectFilteredContacts);
+
+  if (isLoading && !error) {
+    return <b>Request in progress...</b>;
+  }
+
+  if (error) {
+    Notify.failure(error, { position: 'center-top' });
+    return <b>Error</b>;
+  }
 
   const onDeleteContact = id => {
     dispatch(deleteContact(id));
